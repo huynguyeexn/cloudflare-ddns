@@ -92,35 +92,30 @@ const updateLatestIpv4ToEnv = async (ip) => {
 };
 
 const getIpV4 = async () => {
-  try {
-    const promise = Promise.all(
-      IP_QUERY_APIS.map(async (endpoint) => {
-        const response = await fetch(endpoint);
+  const promise = Promise.all(
+    IP_QUERY_APIS.map(async (endpoint) => {
+      const response = await fetch(endpoint);
 
-        if (!response.ok) {
-          return;
-        }
-        const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-        const responseIp = (await response.text()).match(ipv4Regex);
+      if (!response.ok) {
+        return;
+      }
+      const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+      const responseIp = (await response.text()).match(ipv4Regex);
 
-        return responseIp ? responseIp[0] : responseIp;
-      })
+      return responseIp ? responseIp[0] : responseIp;
+    })
+  );
+
+  const result = (await promise).filter((x) => x);
+
+  if (result.length < 1) {
+    logging(
+      "All checked services did not return any ip address. Please check your internet connection. "
     );
-
-    const result = (await promise).filter((x) => x);
-
-    if (result.length < 1) {
-      logging(
-        "All checked services did not return any ip address. Please check your internet connection. "
-      );
-      return;
-    }
-
-    return result[0];
-  } catch (error) {
-    logging(["!!! ERROR !!! - Cannot fetch your ip address. ", error]);
-    return false;
+    return;
   }
+
+  return result[0];
 };
 
 const getAllRecords = async (zoneId) => {
@@ -203,6 +198,7 @@ const main = async () => {
   }
 
   const ipv4 = await getIpV4();
+  if(!ipv4) return;
   if (ipv4 === process.env.LATEST_IPV4) {
     logging(["There is no change of IP"]);
     return;
