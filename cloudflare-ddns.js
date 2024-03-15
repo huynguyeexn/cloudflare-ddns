@@ -148,8 +148,8 @@ const getAllRecords = async (zoneIds) => {
           return false;
         }
 
-        return (await response.json()).result.filter(
-          (record) => record.type === "A"
+        return (await response.json()).result.filter((record) =>
+          ["A", "AAAA"].includes(record.type)
         );
       })
     );
