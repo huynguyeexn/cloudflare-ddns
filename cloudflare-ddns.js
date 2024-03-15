@@ -25,6 +25,7 @@ const verifyToken = async () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.API_TOKEN}`,
       },
+      keepalive: false,
     });
 
     if (!response.ok) {
@@ -43,7 +44,7 @@ const verifyToken = async () => {
   }
 };
 
-const getZoneId = async () => {
+const getZoneIds = async () => {
   try {
     const response = await fetch(CLOUDFLARE_ZONE_QUERY_API, {
       headers: {
@@ -57,7 +58,13 @@ const getZoneId = async () => {
       return false;
     }
 
-    return (await response.json()).result[0].id;
+    const allZone = await response.json();
+    const zoneIds =
+      allZone?.result.filter((zone) => {
+        return process.env.RECORDS_NAME.includes(zone.name);
+      }) || [];
+
+    return zoneIds.map((zone) => zone.id);
   } catch (error) {
     logging([
       "!!! ERROR !!! - Something wrong when fetch to get Zone ID. ",
@@ -118,27 +125,36 @@ const getIpV4 = async () => {
   return result[0];
 };
 
-const getAllRecords = async (zoneId) => {
+const getAllRecords = async (zoneIds) => {
   try {
-    const url = CLOUDFLARE_ZONE_DNS_RECORDS_QUERY_API.replace(
-      "{zone_id}",
-      zoneId
-    );
-    const response = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.API_TOKEN}`,
-      },
-    });
+    const records = await Promise.all(
+      zoneIds.map(async (zoneId) => {
+        const url = CLOUDFLARE_ZONE_DNS_RECORDS_QUERY_API.replace(
+          "{zone_id}",
+          zoneId
+        );
+        const response = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.API_TOKEN}`,
+          },
+        });
 
-    if (!response.ok) {
-      logging(["Cannot get DNS Records. Please check and try again. ", error]);
-      return false;
-    }
+        if (!response.ok) {
+          logging([
+            "Cannot get DNS Records. Please check and try again. ",
+            error,
+          ]);
+          return false;
+        }
 
-    return (await response.json()).result.filter(
-      (record) => record.type === "A"
+        return (await response.json()).result.filter(
+          (record) => record.type === "A"
+        );
+      })
     );
+
+    return records.flat();
   } catch (error) {
     logging(["!!! ERROR !!! - Something wrong when get DNS Records. ", error]);
     return;
@@ -149,6 +165,8 @@ const getUpdateRecords = async (records, ipv4) => {
   try {
     const promise = Promise.all(
       records.map(async (record) => {
+        if (!process.env.RECORDS_NAME.includes(record.name)) return;
+
         const url = CLOUDFLARE_ZONE_DNS_RECORDS_UPDATE_API.replace(
           "{zone_id}",
           record.zone_id
@@ -190,6 +208,19 @@ const getUpdateRecords = async (records, ipv4) => {
   }
 };
 
+const checkValidIpV4 = (ipv4) => {
+  if (ipv4 && (typeof ipv4 === "string" || ipv4 instanceof String)) {
+    if (ipv4 !== process.env.LATEST_IPV4) {
+      return true;
+    }
+    logging(["There is no change of IP"]);
+  } else {
+    logging(["checkValidIpV4 value invalid, value:", ipv4]);
+  }
+
+  return false;
+};
+
 const main = async () => {
   const isValid = await verifyToken();
   if (!isValid) {
@@ -198,16 +229,12 @@ const main = async () => {
   }
 
   const ipv4 = await getIpV4();
-  if(!ipv4) return;
-  if (ipv4 === process.env.LATEST_IPV4) {
-    logging(["There is no change of IP"]);
-    return;
+  if (checkValidIpV4(ipv4)) {
+    updateLatestIpv4ToEnv(ipv4);
+    const zoneIDs = await getZoneIds();
+    const allRecords = await getAllRecords(zoneIDs);
+    await getUpdateRecords(allRecords, ipv4);
   }
-
-  updateLatestIpv4ToEnv(ipv4);
-  const zoneID = await getZoneId();
-  const allRecords = await getAllRecords(zoneID);
-  await getUpdateRecords(allRecords, ipv4);
   return;
 };
 
