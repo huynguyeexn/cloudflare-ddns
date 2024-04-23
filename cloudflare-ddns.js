@@ -115,7 +115,7 @@ const getIpV4 = async () => {
         const responseIp = (await response.text()).match(ipv4Regex);
   
         return responseIp ? responseIp[0] : responseIp;
-      } catch() {}
+      } catch(error) {}
     })
   );
 
