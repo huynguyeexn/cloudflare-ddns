@@ -40,6 +40,10 @@ const verifyToken = async () => {
 
     return true;
   } catch (error) {
+    logging([
+      "!!! ERROR !!! - Something wrong when verify token. ",
+      error,
+    ]);
     throw new Error(error);
   }
 };
@@ -101,15 +105,17 @@ const updateLatestIpv4ToEnv = async (ip) => {
 const getIpV4 = async () => {
   const promise = Promise.all(
     IP_QUERY_APIS.map(async (endpoint) => {
-      const response = await fetch(endpoint);
+      try { 
+        const response = await fetch(endpoint);
 
-      if (!response.ok) {
-        return;
-      }
-      const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-      const responseIp = (await response.text()).match(ipv4Regex);
-
-      return responseIp ? responseIp[0] : responseIp;
+        if (!response.ok) {
+          return;
+        }
+        const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+        const responseIp = (await response.text()).match(ipv4Regex);
+  
+        return responseIp ? responseIp[0] : responseIp;
+      } catch() {}
     })
   );
 
