@@ -41,8 +41,13 @@ Thiết lập lại các thông số của file .env.
   - Mảng các records cần cập nhật.
   - Ví dụ `RECORDS_NAME=["domaincuaban.com"]`, `RECORDS_NAME=["domain1.com", "domain2.com"]`
 - `LATEST_IPV4`
-  - IP gần nhất được cập nhật, script sẽ tự động điền, không cần điền cũng được.
+  - IPv4 gần nhất được cập nhật, script sẽ tự động điền, không cần điền.
   - Ví dụ `LATEST_IPV4=142.251.214.142`.
+- `LATEST_IPV6`
+  - IPv6 gần nhất được cập nhật, script sẽ tự động điền, không cần điền.
+  - Ví dụ `LATEST_IPV6=2405:4803:ffff:ffff:ffff:ffff:ffff:fffe`.
+- `LOGGING_WHEN_UNCHANGED_IP_ADDRESS`
+  - Show log nếu IP không có sự thay đổi (mặc định: false)
 
 ### Run source
 
@@ -66,7 +71,7 @@ Trong source code có file `cloudflare-ddns-crontab`, được thiết lập cơ
 
 - `*/5 * * * *` chạy crontab mỗi 5 phút, xem thêm tại đây [crontab.guru](https://crontab.guru/examples.html).
 - `cd /root/.cloudflare-ddns/` di chuyển tới thư mục chứa source code, chỉnh sửa giá trị trên thành đường dẫn đến thư mục source code của bạn.
-- `bun cloudflare-ddns.js >> logs 2>&1` run source và ghi kết quả vào file `logs`.
+- `bun cloudflare-ddns.js >> error.log 2>&1` run source và ghi lỗi vào file `error.log`.
 
 Sau khi cập nhật lại các thiết lập trong file `cloudflare-ddns-crontab`.
 
