@@ -60,6 +60,7 @@ class Logging {
     }
 
     if (output !== "") {
+console.log(output);
       await appendFile(fileLogName, output);
     }
   }
@@ -73,6 +74,14 @@ class Logging {
     this.print(messages);
   }
 }
+
+const fetchTimeout = (url, ms, { signal, ...options } = {}) => {
+  const controller = new AbortController();
+  const promise = fetch(url, { signal: controller.signal, ...options });
+  if (signal) signal.addEventListener("abort", () => controller.abort());
+  const timeout = setTimeout(() => controller.abort(), ms);
+  return promise.finally(() => clearTimeout(timeout));
+};
 
 const verifyToken = async () => {
   try {
@@ -172,11 +181,12 @@ const updateLatestIPv6ToEnv = async (ip) => {
 
 const getIpV4 = async () => {
   try {
+	 const controller = new AbortController();
+
     const IPv4 = await Promise.any(
       GET_IPV4_APIS.map(async (endpoint) => {
         try {
-          const response = await fetch(endpoint);
-
+          const response = await fetchTimeout(endpoint, 5000);
           if (!response.ok) {
             return;
           }
@@ -361,6 +371,7 @@ const checkValidIPv6 = (IPv6 = null) => {
 };
 
 const main = async () => {
+	try {
   const IPv4 = await getIpV4();
   const IPv6 = await getIpV6();
   if (!checkValidIPv4(IPv4) && !checkValidIPv6(IPv6)) return;
@@ -371,6 +382,10 @@ const main = async () => {
   const zoneIDs = await getZoneIds();
   const allRecords = await getAllRecords(zoneIDs);
   await getUpdateRecords(allRecords, IPv4, IPv6);
+	} catch (e) {
+		Logging.error(["main():", e]);
+	}
+return;
 };
 
 main();
