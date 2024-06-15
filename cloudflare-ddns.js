@@ -216,7 +216,7 @@ const getIpV6 = async () => {
     const IPv6 = await Promise.any(
       GET_IPV6_APIS.map(async (endpoint) => {
         try {
-          const response = await fetch(endpoint);
+          const response = await fetchTimeout(endpoint, 5000);
 
           if (!response.ok) {
             return;
