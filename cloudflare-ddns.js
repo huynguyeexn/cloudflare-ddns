@@ -186,7 +186,7 @@ const getIpV4 = async () => {
     const IPv4 = await Promise.any(
       GET_IPV4_APIS.map(async (endpoint) => {
         try {
-          const response = await fetchTimeout(endpoint, 5000);
+          const response = await fetchTimeout(endpoint, 1000);
           if (!response.ok) {
             return;
           }
@@ -216,7 +216,7 @@ const getIpV6 = async () => {
     const IPv6 = await Promise.any(
       GET_IPV6_APIS.map(async (endpoint) => {
         try {
-          const response = await fetchTimeout(endpoint, 5000);
+          const response = await fetchTimeout(endpoint, 1000);
 
           if (!response.ok) {
             return;
