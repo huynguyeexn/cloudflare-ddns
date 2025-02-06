@@ -265,9 +265,11 @@ const getAllRecords = async (zoneIds) => {
           return false;
         }
 
-        return (await response.json()).result.filter((record) =>
+        const result = (await response.json()).result.filter((record) =>
           ["A", "AAAA"].includes(record.type)
         );
+
+        return result.map(r => ({...r, zone_id: zoneId}));
       })
     );
 
