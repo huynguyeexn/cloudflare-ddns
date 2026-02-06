@@ -6,13 +6,15 @@ import { serviceCommand } from './commands/service.js';
 import { testNotiCommand } from './commands/test-noti.js';
 import { logsCommand } from './commands/logs.js';
 import { updateCommand } from './commands/update.js';
+import { selfUpdateCommand } from './commands/self-update.js';
 
 import { ConfigService } from './services/config.service.js';
 import chalk from 'chalk';
+import { APP_NAME, APP_DESCRIPTION, APP_VERSION } from './constants.js';
 
 const program = new Command();
 
-program.name('cloudflare-ddns').description('Cloudflare Dynamic DNS Client').version('1.0.0');
+program.name(APP_NAME).description(APP_DESCRIPTION).version(APP_VERSION);
 
 program.command('setup').description('Run interactive wizard to configure the client').action(setupCommand);
 
@@ -62,6 +64,13 @@ program
     .option('-n, --lines <number>', 'Number of lines to show', '20')
     .option('-f, --follow', 'Follow log output')
     .action(logsCommand);
+
+program
+    .command('self-update')
+    .alias('check-update')
+    .description('Check for updates and update the binary')
+    .option('--check', 'Only check for updates without downloading')
+    .action((options) => selfUpdateCommand({ checkOnly: options.check }));
 
 
 

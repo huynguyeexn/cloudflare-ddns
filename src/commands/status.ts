@@ -12,8 +12,8 @@ export async function statusCommand() {
     console.log(chalk.bold('\n📊 Cloudflare DDNS Status\n'));
 
     // 1. IP Information
-    const v4 = config.lastKnownIp?.v4 || chalk.gray('Unknown');
-    const v6 = config.lastKnownIp?.v6 || chalk.gray('Unknown');
+    const v4 = config.enableIpv4 === false ? chalk.gray('Disabled') : config.lastKnownIp?.v4 || chalk.gray('Unknown');
+    const v6 = config.enableIpv6 === false ? chalk.gray('Disabled') : config.lastKnownIp?.v6 || chalk.gray('Unknown');
 
     console.log(`  ${chalk.cyan('IPv4:')} ${v4}`);
     console.log(`  ${chalk.cyan('IPv6:')} ${v6}`);

@@ -2,11 +2,14 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import chalk from 'chalk';
+import { ENV_VARS, DEFAULT_CONFIG_DIR, DEFAULT_CONFIG_FILE } from '../constants.js';
 
 export interface Config {
     apiToken: string;
     records: string[]; // List of domains/subdomains
     interval: number; // in seconds, default 300
+    enableIpv4?: boolean;
+    enableIpv6?: boolean;
     lastKnownIp?: {
         v4?: string;
         v6?: string;
@@ -30,11 +33,11 @@ export class ConfigService {
     constructor(customPath?: string) {
         if (customPath) {
             this.configPath = customPath;
-        } else if (process.env.CLOUDFLARE_DDNS_CONFIG_PATH) {
-            this.configPath = process.env.CLOUDFLARE_DDNS_CONFIG_PATH;
+        } else if (process.env[ENV_VARS.CONFIG_PATH]) {
+            this.configPath = process.env[ENV_VARS.CONFIG_PATH]!;
         } else {
-            const configDir = path.join(os.homedir(), '.config', 'cloudflare-ddns');
-            this.configPath = path.join(configDir, 'config.json');
+            const configDir = path.join(os.homedir(), DEFAULT_CONFIG_DIR);
+            this.configPath = path.join(configDir, DEFAULT_CONFIG_FILE);
         }
     }
 

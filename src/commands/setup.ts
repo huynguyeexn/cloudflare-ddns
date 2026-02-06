@@ -2,7 +2,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { ConfigService, type Config } from '../services/config.service.js';
 import { CloudflareService } from '../services/cloudflare.service.js';
-
+import { DEFAULT_INTERVAL, DEFAULT_NTFY_URL } from '../constants.js';
 
 export async function setupCommand() {
     console.log(chalk.blue.bold('Cloudflare DDNS Setup Wizard'));
@@ -82,25 +82,37 @@ export async function setupCommand() {
 
     const uniqueNames = [...new Set(allRecords.map((r) => r.name))];
 
-    const { selectedRecords, interval } = await inquirer.prompt([
+    const { selectedRecords, interval, enableIpv4, enableIpv6 } = await inquirer.prompt([
         {
             type: 'checkbox',
             name: 'selectedRecords',
             message: 'Select the DNS Records (subdomains) to update automatically:',
             choices: uniqueNames,
             default: currentConfig?.records,
-            validate: (input) => (input.length > 0 ? true : 'Choose at least one record')
+            validate: (input: string[]) => (input.length > 0 ? true : 'Choose at least one record')
         },
         {
             type: 'input',
             name: 'interval',
             message: 'Check interval in seconds (>= 10):',
-            default: currentConfig?.interval ? String(currentConfig.interval) : '300',
-            validate: (value) => {
+            default: currentConfig?.interval ? String(currentConfig.interval) : String(DEFAULT_INTERVAL),
+            validate: (value: string) => {
                 const parsed = parseInt(value, 10);
                 return !isNaN(parsed) && parsed >= 10 ? true : 'Interval must be a number >= 10';
             },
-            filter: (value) => parseInt(value, 10)
+            filter: (value: string) => parseInt(value, 10)
+        },
+        {
+            type: 'confirm',
+            name: 'enableIpv4',
+            message: 'Enable IPv4 (A records)?',
+            default: currentConfig?.enableIpv4 !== undefined ? currentConfig.enableIpv4 : true
+        },
+        {
+            type: 'confirm',
+            name: 'enableIpv6',
+            message: 'Enable IPv6 (AAAA records)?',
+            default: currentConfig?.enableIpv6 !== undefined ? currentConfig.enableIpv6 : true
         }
     ]);
 
@@ -121,8 +133,8 @@ export async function setupCommand() {
             {
                 type: 'input',
                 name: 'url',
-                message: 'NTFY Server URL (default: https://ntfy.sh):',
-                default: currentConfig?.notifications?.ntfy?.url || 'https://ntfy.sh'
+                message: `NTFY Server URL (default: ${DEFAULT_NTFY_URL}):`,
+                default: currentConfig?.notifications?.ntfy?.url || DEFAULT_NTFY_URL
             },
             {
                 type: 'input',
@@ -154,6 +166,8 @@ export async function setupCommand() {
         apiToken,
         records: selectedRecords,
         interval: interval,
+        enableIpv4,
+        enableIpv6,
         notifications: notificationConfig
     };
 

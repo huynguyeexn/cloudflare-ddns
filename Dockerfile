@@ -12,19 +12,19 @@ RUN bun install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build standalone binary
-RUN bun run build
+# Build bundled JS instead of standalone binary for smaller image size
+RUN bun build src/index.ts --outfile dist/index.js --target bun --minify
 
 # Final stage
-FROM debian:bookworm-slim
+FROM oven/bun:alpine
 
 WORKDIR /app
 
-# Install dependencies for the binary (if any)
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+# Install ca-certificates for HTTPS requests
+RUN apk add --no-cache ca-certificates
 
-# Copy the binary from builder
-COPY --from=builder /app/cloudflare-ddns /usr/local/bin/cloudflare-ddns
+# Copy the bundled code from builder
+COPY --from=builder /app/dist/index.js ./index.js
 
 # Create config directory
 RUN mkdir -p /config
@@ -35,5 +35,5 @@ ENV CLOUDFLARE_DDNS_LOG_PATH=/config/app.log
 
 VOLUME ["/config"]
 
-ENTRYPOINT ["cloudflare-ddns"]
+ENTRYPOINT ["bun", "run", "index.js"]
 CMD ["run"]

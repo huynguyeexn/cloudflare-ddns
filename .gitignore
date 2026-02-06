@@ -4,3 +4,4 @@ logs
 log
 cloudflare-ddns
 node_modules
+dist

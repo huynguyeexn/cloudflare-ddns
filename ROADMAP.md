@@ -42,7 +42,7 @@ This document outlines the planned features and improvements for `cloudflare-ddn
 - [ ] **Network Interface Binding**: Select specific network interface (e.g., `eth0`, `wlan0`) for multi-WAN setups.
 
 ## 🌟 Phase 4: Pro Features
-- [ ] **Self-update**: Add `cloudflare-ddns self-update` to automatically pull latest binary from GitHub.
+- [x] **Self-update**: Add `cloudflare-ddns self-update` to automatically pull latest binary from GitHub.
 - [ ] **IP History**: Track and display last $N$ IP changes in `cloudflare-ddns status`.
 - [ ] **Hooks / Scripts**: Support `pre-update` and `post-update` shell scripts.
 - [ ] **Health Checks**: Support integration with services like Healthchecks.io or Uptime Kuma.

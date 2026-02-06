@@ -27,20 +27,25 @@ export class DdnsService {
         }
 
         try {
-            const ipv4 = await IpService.getIpV4();
-            const ipv6 = await IpService.getIpV6();
+            const enableIpv4 = config.enableIpv4 !== false;
+            const enableIpv6 = config.enableIpv6 !== false;
 
-            Logger.info(`Detected IPv4: ${ipv4 || 'null'}, IPv6: ${ipv6 || 'null'}`);
+            const ipv4 = enableIpv4 ? await IpService.getIpV4() : undefined;
+            const ipv6 = enableIpv6 ? await IpService.getIpV6() : undefined;
+
+            if (enableIpv4 || enableIpv6) {
+                Logger.info(`Detected ${enableIpv4 ? `IPv4: ${ipv4 || 'null'}` : ''}${enableIpv4 && enableIpv6 ? ', ' : ''}${enableIpv6 ? `IPv6: ${ipv6 || 'null'}` : ''}`);
+            }
 
             let ipChanged = false;
             const currentLastKnown = config.lastKnownIp || {};
 
-            if (ipv4 && ipv4 !== currentLastKnown.v4) {
+            if (enableIpv4 && ipv4 && ipv4 !== currentLastKnown.v4) {
                 Logger.info(`IPv4 changed: ${currentLastKnown.v4 || 'None'} -> ${ipv4}`);
                 ipChanged = true;
             }
 
-            if (ipv6 && ipv6 !== currentLastKnown.v6) {
+            if (enableIpv6 && ipv6 && ipv6 !== currentLastKnown.v6) {
                 Logger.info(`IPv6 changed: ${currentLastKnown.v6 || 'None'} -> ${ipv6}`);
                 ipChanged = true;
             }
@@ -86,8 +91,14 @@ export class DdnsService {
 
                 await Promise.all(updates);
 
-                // Save new IPs
-                config.lastKnownIp = { v4: ipv4 || undefined, v6: ipv6 || undefined };
+                // Save new IPs - preserve old values if fetch failed or protocol is disabled
+                const enableIpv4 = config.enableIpv4 !== false;
+                const enableIpv6 = config.enableIpv6 !== false;
+
+                config.lastKnownIp = {
+                    v4: enableIpv4 ? ipv4 || currentLastKnown.v4 : currentLastKnown.v4,
+                    v6: enableIpv6 ? ipv6 || currentLastKnown.v6 : currentLastKnown.v6
+                };
                 config.lastSuccess = new Date().toISOString();
                 config.lastMessage = force ? 'Force update completed successfully.' : 'Service is running normally.';
                 await this.configService.save(config);
