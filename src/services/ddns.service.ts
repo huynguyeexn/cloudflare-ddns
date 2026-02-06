@@ -16,7 +16,7 @@ export class DdnsService {
     async performUpdate(force: boolean = false): Promise<void> {
         const config = await this.configService.load();
         if (!config) {
-            throw new Error('Configuration not found. Please run "cfddns setup" first.');
+            throw new Error('Configuration not found. Please run "cloudflare-ddns setup" first.');
         }
 
         if (!this.cfService) {
@@ -45,9 +45,12 @@ export class DdnsService {
                 ipChanged = true;
             }
 
-            if (ipChanged || force) {
+            const isFirstRun = !config.lastKnownIp || (!config.lastKnownIp.v4 && !config.lastKnownIp.v6);
+            if (ipChanged || force || isFirstRun) {
                 if (force && !ipChanged) {
                     Logger.info('Force update triggered. Updating Cloudflare records...');
+                } else if (isFirstRun && !ipChanged) {
+                    Logger.info('First run detected. Syncing records with Cloudflare...');
                 } else if (ipChanged) {
                     Logger.info('IP Address changed. Updating Cloudflare records...');
                 }

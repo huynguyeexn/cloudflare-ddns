@@ -7,7 +7,7 @@ export async function testNotiCommand() {
     const config = await configService.load();
 
     if (!config) {
-        Logger.error('Configuration not found. Please run "cfddns setup" first.');
+        Logger.error('Configuration not found. Please run "cloudflare-ddns setup" first.');
         process.exit(1);
     }
 

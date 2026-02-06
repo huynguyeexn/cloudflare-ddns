@@ -5,7 +5,7 @@ import globals from 'globals';
 
 export default tseslint.config(
     {
-        ignores: ['dist', 'node_modules', 'cfddns', 'install.sh']
+        ignores: ['dist', 'node_modules', 'cloudflare-ddns', 'install.sh']
     },
     eslint.configs.recommended,
     ...tseslint.configs.recommended,

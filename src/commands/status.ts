@@ -10,7 +10,7 @@ export async function statusCommand() {
     const config = await configService.load();
 
     if (!config) {
-        console.log(chalk.red('Configuration not found. Please run "cfddns setup" first.'));
+        console.log(chalk.red('Configuration not found. Please run "cloudflare-ddns setup" first.'));
         process.exit(1);
     }
 
@@ -62,7 +62,7 @@ export async function statusCommand() {
     if (process.platform === 'linux') {
         serviceLabel = 'Systemd';
         try {
-            const { stdout } = await execAsync('systemctl is-active cfddns');
+            const { stdout } = await execAsync('systemctl is-active cloudflare-ddns');
             const isActive = stdout.trim() === 'active';
             serviceStatus = isActive ? chalk.green('Active (Running)') : chalk.red('Inactive');
         } catch {
@@ -81,9 +81,9 @@ export async function statusCommand() {
             // Sudo might be required to see system daemons.
             // Fallback: check process list
             try {
-                // pgrep -f "cfddns start"
-                // We need to exclude the current process if possible, but "cfddns status" != "cfddns start"
-                const { stdout: pgrepOut } = await execAsync('pgrep -f "cfddns start"');
+                // pgrep -f "cloudflare-ddns run"
+                // We need to exclude the current process if possible, but "cloudflare-ddns status" != "cloudflare-ddns run"
+                const { stdout: pgrepOut } = await execAsync('pgrep -f "cloudflare-ddns run"');
                 if (pgrepOut.trim().length > 0) {
                     serviceStatus = chalk.green('Active (Running via PID)');
                 } else {

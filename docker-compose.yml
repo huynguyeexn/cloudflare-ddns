@@ -1,11 +1,11 @@
 services:
-  cfddns:
+  cloudflare-ddns:
     build: .
-    image: cfddns:latest
-    container_name: cfddns
+    image: cloudflare-ddns:latest
+    container_name: cloudflare-ddns
     restart: unless-stopped
     volumes:
       - ./config:/config
     environment:
-      - CFDDNS_CONFIG_PATH=/config/config.json
-      - CFDDNS_LOG_PATH=/config/app.log
+      - CLOUDFLARE_DDNS_CONFIG_PATH=/config/config.json
+      - CLOUDFLARE_DDNS_LOG_PATH=/config/app.log

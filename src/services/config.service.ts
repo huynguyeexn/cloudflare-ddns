@@ -29,8 +29,8 @@ export class ConfigService {
     constructor(customPath?: string) {
         if (customPath) {
             this.configPath = customPath;
-        } else if (process.env.CFDDNS_CONFIG_PATH) {
-            this.configPath = process.env.CFDDNS_CONFIG_PATH;
+        } else if (process.env.CLOUDFLARE_DDNS_CONFIG_PATH) {
+            this.configPath = process.env.CLOUDFLARE_DDNS_CONFIG_PATH;
         } else {
             const configDir = path.join(os.homedir(), '.config', 'cloudflare-ddns');
             this.configPath = path.join(configDir, 'config.json');

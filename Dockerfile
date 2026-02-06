@@ -24,16 +24,16 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Copy the binary from builder
-COPY --from=builder /app/cfddns /usr/local/bin/cfddns
+COPY --from=builder /app/cloudflare-ddns /usr/local/bin/cloudflare-ddns
 
 # Create config directory
 RUN mkdir -p /config
 
 # Set config path and log path environment variables
-ENV CFDDNS_CONFIG_PATH=/config/config.json
-ENV CFDDNS_LOG_PATH=/config/app.log
+ENV CLOUDFLARE_DDNS_CONFIG_PATH=/config/config.json
+ENV CLOUDFLARE_DDNS_LOG_PATH=/config/app.log
 
 VOLUME ["/config"]
 
-ENTRYPOINT ["cfddns"]
-CMD ["start"]
+ENTRYPOINT ["cloudflare-ddns"]
+CMD ["run"]

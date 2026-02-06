@@ -29,7 +29,7 @@ export async function serviceCommand(action: 'install' | 'uninstall' | 'start' |
     const plistPath = `/Library/LaunchDaemons/${plistName}.plist`;
 
     // Linux Configuration
-    const serviceName = 'cfddns';
+    const serviceName = 'cloudflare-ddns';
     const servicePath = `/etc/systemd/system/${serviceName}.service`;
 
     if (action === 'install') {
@@ -48,7 +48,7 @@ export async function serviceCommand(action: 'install' | 'uninstall' | 'start' |
     <key>ProgramArguments</key>
     <array>
         <string>${execPath}</string>
-        <string>start</string>
+        <string>run</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
@@ -103,7 +103,7 @@ After=network.target
 [Service]
 Type=simple
 User=${user}
-ExecStart=${execPath} start
+ExecStart=${execPath} run
 Restart=always
 RestartSec=10
 Environment="HOME=${home}"

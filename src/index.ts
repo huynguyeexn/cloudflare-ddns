@@ -12,11 +12,16 @@ import chalk from 'chalk';
 
 const program = new Command();
 
-program.name('cfddns').description('Cloudflare Dynamic DNS Client').version('1.0.0');
+program.name('cloudflare-ddns').description('Cloudflare Dynamic DNS Client').version('1.0.0');
 
 program.command('setup').description('Run interactive wizard to configure the client').action(setupCommand);
 
-program.command('start').description('Start the DDNS check loop (foreground)').action(startCommand);
+const runGroup = program.command('run').description('Start the DDNS check loop (foreground)').action(startCommand);
+
+runGroup
+    .command('now')
+    .description('Manually trigger Cloudflare record updates once')
+    .action(() => updateCommand({ force: true }));
 
 program.command('status').description('Show current status').action(statusCommand);
 
@@ -34,7 +39,7 @@ program
             console.log(`Allowed actions: ${allowed.join(', ')}`);
             process.exit(1);
         }
-        serviceCommand(action as any);
+        serviceCommand(action as 'install' | 'uninstall' | 'start' | 'stop' | 'restart');
     });
 
 program
@@ -62,10 +67,6 @@ program
     .option('-f, --follow', 'Follow log output')
     .action(logsCommand);
 
-program
-    .command('update')
-    .description('Manually trigger Cloudflare record updates')
-    .option('--force', 'Force update even if IP hasn\'t changed', false)
-    .action(updateCommand);
+
 
 program.parse();

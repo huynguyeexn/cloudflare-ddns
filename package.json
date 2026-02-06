@@ -5,8 +5,8 @@
     "main": "src/index.ts",
     "type": "module",
     "scripts": {
-        "build": "bun build --compile --minify --sourcemap src/index.ts --outfile cfddns",
-        "start": "bun run src/index.ts",
+        "build": "bun build --compile --minify --sourcemap src/index.ts --outfile cloudflare-ddns",
+        "start": "bun run src/index.ts run",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write ."

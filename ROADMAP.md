@@ -1,6 +1,6 @@
 # 🗺️ Product Roadmap
 
-This document outlines the planned features and improvements for `cfddns`.
+This document outlines the planned features and improvements for `cloudflare-ddns`.
 
 ## 🚀 Phase 1: Essentials & Reliability
 - [x] **Log Rotation**: Prevent log files from growing indefinitely.
@@ -18,12 +18,12 @@ This document outlines the planned features and improvements for `cfddns`.
 - [x] **Service Management**:
   - [x] Support Systemd (Linux).
   - [x] Support Launchd (macOS).
-  - [x] Manage service with `cfddns service start|stop|restart`.
-- [x] **Status Command**: Add `cfddns status` to view:
+  - [x] Manage service with `cloudflare-ddns service start|stop|restart`.
+- [x] **Status Command**: Add `cloudflare-ddns status` to view:
   - Current detected IP (v4/v6).
   - Last update timestamp.
   - Service health status.
-- [x] **Logs Command**: Add `cfddns logs` to view and follow logs.
+- [x] **Logs Command**: Add `cloudflare-ddns logs` to view and follow logs.
 - [x] **Distribution**:
   - [x] GitHub Actions CI/CD for cross-platform binaries.
   - [x] Intelligent installer with pre-built binary detection.
@@ -32,18 +32,18 @@ This document outlines the planned features and improvements for `cfddns`.
   - [x] Create `docker-compose.yml`.
   - [x] CI/CD to Docker Hub via GitHub Actions.
 - [ ] **Cron / One-shot Mode**: Add `--once` flag provided for users who prefer system `crontab`.
-- [x] **Force Update**: Add `cfddns update --force` to manually trigger Cloudflare record updates (even if IP hasn't changed).
+- [x] **Manual Sync**: Add `cloudflare-ddns run now` to manually trigger Cloudflare record updates (always forced).
 
 ## ⚡ Phase 3: Advanced Features
 - [ ] **Custom IP Providers**: Allow users to configure their own list of "Check IP" URLs in `config.json`.
-- [ ] **Dry Run Mode**: Add `cfddns update --dry-run` to simulate updates without calling APIs.
+- [ ] **Dry Run Mode**: Add `cloudflare-ddns run now --dry-run` to simulate updates without calling APIs.
 - [ ] **Proxy Toggle**: Add ability to toggle Cloudflare Proxy (orange cloud) via CLI.
-- [ ] **Interactive Config Editor**: Add `cfddns config edit` to modify specific settings without rerunning setup.
+- [ ] **Interactive Config Editor**: Add `cloudflare-ddns config edit` to modify specific settings without rerunning setup.
 - [ ] **Network Interface Binding**: Select specific network interface (e.g., `eth0`, `wlan0`) for multi-WAN setups.
 
 ## 🌟 Phase 4: Pro Features
-- [ ] **Self-update**: Add `cfddns self-update` to automatically pull latest binary from GitHub.
-- [ ] **IP History**: Track and display last $N$ IP changes in `cfddns status`.
+- [ ] **Self-update**: Add `cloudflare-ddns self-update` to automatically pull latest binary from GitHub.
+- [ ] **IP History**: Track and display last $N$ IP changes in `cloudflare-ddns status`.
 - [ ] **Hooks / Scripts**: Support `pre-update` and `post-update` shell scripts.
 - [ ] **Health Checks**: Support integration with services like Healthchecks.io or Uptime Kuma.
 - [ ] **Web Dashboard**: Optional mini web UI to monitor status and logs via browser.

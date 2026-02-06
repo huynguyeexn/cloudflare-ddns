@@ -8,7 +8,7 @@ set -e
 
 REPO="huynguyeexn/cloudflare-ddns"
 INSTALL_DIR="/usr/local/bin"
-APP_NAME="cfddns"
+APP_NAME="cloudflare-ddns"
 
 echo "🚀 Installing Cloudflare DDNS ($APP_NAME)..."
 

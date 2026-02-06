@@ -21,14 +21,14 @@ curl -fsSL https://raw.githubusercontent.com/huynguyeexn/cloudflare-ddns/main/in
 
 ## Sử dụng
 
-Sau khi cài đặt, bạn có thể sử dụng lệnh `cfddns` từ bất kỳ đâu.
+Sau khi cài đặt, bạn có thể sử dụng lệnh `cloudflare-ddns` từ bất kỳ đâu.
 
 ### 1. Cấu hình (Setup)
 
 Lần đầu chạy cần cấu hình Token và chọn Domain:
 
 ```bash
-cfddns setup
+cloudflare-ddns setup
 ```
 
 ### 2. Cài đặt Service (Chạy ngầm)
@@ -36,7 +36,7 @@ cfddns setup
 Để tool tự động chạy ngầm và khởi động cùng máy:
 
 ```bash
-sudo cfddns service install
+sudo cloudflare-ddns service install
 ```
 
 Dịch vụ này hỗ trợ cả **Systemd (Linux)** và **Launchd (macOS)**.
@@ -45,20 +45,27 @@ Dịch vụ này hỗ trợ cả **Systemd (Linux)** và **Launchd (macOS)**.
 
 Xem trạng thái hoạt động của IP và Service:
 ```bash
-cfddns status
+cloudflare-ddns status
 ```
 
 Xem logs realtime:
 ```bash
-cfddns logs -f
+cloudflare-ddns logs -f
 ```
 
 ### 4. Các lệnh quản lý Service
 
-- **Dừng service**: `sudo cfddns service stop`
-- **Chạy lại service**: `sudo cfddns service start`
-- **Khởi động lại**: `sudo cfddns service restart`
-- **Gỡ bỏ service**: `sudo cfddns service uninstall`
+- **Dừng service**: `sudo cloudflare-ddns service stop`
+- **Chạy lại service**: `sudo cloudflare-ddns service start`
+- **Khởi động lại**: `sudo cloudflare-ddns service restart`
+- **Gỡ bỏ service**: `sudo cloudflare-ddns service uninstall`
+
+### 5. Cập nhật thủ công (Manual Update)
+
+Chạy cập nhật IP ngay lập tức (luôn ép buộc đồng bộ với Cloudflare):
+```bash
+cloudflare-ddns run now
+```
 
 ## Docker (Khuyên dùng cho NAS/Synology/RPi)
 
@@ -77,13 +84,13 @@ Hoặc chạy lệnh trực tiếp bằng Docker:
 
 ```bash
 docker run -d \
-  --name cfddns \
+  --name cloudflare-ddns \
   --restart unless-stopped \
   -v $(pwd)/config:/config \
   huynguyeexn/cloudflare-ddns:latest
 ```
 
-*Lưu ý: Bạn nên thực hiện lệnh `cfddns setup` trên máy cá nhân trước để lấy file `config.json`, sau đó mount nó vào container.*
+*Lưu ý: Bạn nên thực hiện lệnh `cloudflare-ddns setup` trên máy cá nhân trước để lấy file `config.json`, sau đó mount nó vào container.*
 
 
 ## Phát triển (Dành cho Developer)
@@ -95,7 +102,7 @@ Nếu bạn muốn tự build từ source:
 bun install
 
 # Chạy dev
-bun run src/index.ts start
+bun run src/index.ts run
 
 # Build binary local
 bun run build

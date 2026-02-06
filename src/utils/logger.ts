@@ -8,8 +8,8 @@ export class Logger {
     private static logFile: string = path.join(os.homedir(), '.config', 'cloudflare-ddns', 'app.log');
 
     static {
-        if (process.env.CFDDNS_LOG_PATH) {
-            this.logFile = process.env.CFDDNS_LOG_PATH;
+        if (process.env.CLOUDFLARE_DDNS_LOG_PATH) {
+            this.logFile = process.env.CLOUDFLARE_DDNS_LOG_PATH;
         } else {
             // Handle sudo: we want to log to the real user's home, not /var/root
             const sudoUser = process.env.SUDO_USER;

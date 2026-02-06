@@ -160,5 +160,5 @@ export async function setupCommand() {
     await configService.save(config);
 
     console.log(chalk.green(`Configuration saved to ${configService.getPath()}`));
-    console.log(chalk.blue('You can now run "cfddns start" or "cfddns service install"'));
+    console.log(chalk.blue('You can now run "cloudflare-ddns run" or "cloudflare-ddns service install"'));
 }
