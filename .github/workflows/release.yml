@@ -4,6 +4,10 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -13,16 +17,16 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            target: linux-x64
+            target: bun-linux-x64
             outfile: cfddns-linux-x64
           - os: ubuntu-latest
-            target: linux-arm64
+            target: bun-linux-arm64
             outfile: cfddns-linux-arm64
           - os: macos-latest
-            target: macos-x64
+            target: bun-macos-x64
             outfile: cfddns-macos-x64
           - os: macos-latest
-            target: macos-arm64
+            target: bun-macos-arm64
             outfile: cfddns-macos-arm64
 
     steps:
