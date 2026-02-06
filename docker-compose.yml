@@ -1,0 +1,11 @@
+services:
+  cfddns:
+    build: .
+    image: cfddns:latest
+    container_name: cfddns
+    restart: unless-stopped
+    volumes:
+      - ./config:/config
+    environment:
+      - CFDDNS_CONFIG_PATH=/config/config.json
+      - CFDDNS_LOG_PATH=/config/app.log

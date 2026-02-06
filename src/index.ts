@@ -5,6 +5,7 @@ import { statusCommand } from './commands/status.js';
 import { serviceCommand } from './commands/service.js';
 import { testNotiCommand } from './commands/test-noti.js';
 import { logsCommand } from './commands/logs.js';
+import { updateCommand } from './commands/update.js';
 
 import { ConfigService } from './services/config.service.js';
 import chalk from 'chalk';
@@ -60,5 +61,11 @@ program
     .option('-n, --lines <number>', 'Number of lines to show', '20')
     .option('-f, --follow', 'Follow log output')
     .action(logsCommand);
+
+program
+    .command('update')
+    .description('Manually trigger Cloudflare record updates')
+    .option('--force', 'Force update even if IP hasn\'t changed', false)
+    .action(updateCommand);
 
 program.parse();

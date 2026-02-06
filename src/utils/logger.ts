@@ -7,6 +7,23 @@ import os from 'node:os';
 export class Logger {
     private static logFile: string = path.join(os.homedir(), '.config', 'cloudflare-ddns', 'app.log');
 
+    static {
+        if (process.env.CFDDNS_LOG_PATH) {
+            this.logFile = process.env.CFDDNS_LOG_PATH;
+        } else {
+            // Handle sudo: we want to log to the real user's home, not /var/root
+            const sudoUser = process.env.SUDO_USER;
+            if (sudoUser) {
+                const home = process.platform === 'darwin' ? `/Users/${sudoUser}` : `/home/${sudoUser}`;
+                this.logFile = path.join(home, '.config', 'cloudflare-ddns', 'app.log');
+            }
+        }
+    }
+
+    static getLogFile() {
+        return this.logFile;
+    }
+
     static setLogFile(filePath: string) {
         this.logFile = filePath;
     }

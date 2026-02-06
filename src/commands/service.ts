@@ -3,12 +3,14 @@ import { exec } from 'node:child_process';
 import fs from 'node:fs/promises';
 import util from 'node:util';
 import os from 'node:os';
+import { Logger } from '../utils/logger.js';
 
 const execAsync = util.promisify(exec);
 
-export async function serviceCommand(action: 'install' | 'uninstall') {
+export async function serviceCommand(action: 'install' | 'uninstall' | 'start' | 'stop' | 'restart') {
     const isMac = process.platform === 'darwin';
     const isLinux = process.platform === 'linux';
+    const platformName = isMac ? 'macOS (launchd)' : 'Linux (systemd)';
 
     if (!isMac && !isLinux) {
         console.error(chalk.red('Error: Service management is only supported on Linux (systemd) and macOS (launchd).'));
@@ -80,10 +82,12 @@ export async function serviceCommand(action: 'install' | 'uninstall') {
                 try { await execAsync(`launchctl unload ${plistPath}`); } catch { /* ignore */ }
                 await execAsync(`launchctl load ${plistPath}`);
 
+                await Logger.info(`Service installed and started on ${platformName}`);
                 console.log(chalk.green('Service installed and loaded successfully!'));
                 console.log(chalk.blue(`Check status with: sudo launchctl list | grep ${plistName}`));
                 console.log(chalk.blue(`Logs are at: ${home}/Library/Logs/com.cloudflare-ddns.client.log`));
             } catch (error) {
+                await Logger.error(`Failed to install service on ${platformName}: ${error}`);
                 console.error(chalk.red('Failed to install service:'), error);
             }
         }
@@ -116,9 +120,11 @@ WantedBy=multi-user.target
                 await execAsync(`systemctl enable ${serviceName}`);
                 await execAsync(`systemctl start ${serviceName}`);
 
+                await Logger.info(`Service installed and started on ${platformName}`);
                 console.log(chalk.green('Service installed and started successfully!'));
                 console.log(chalk.blue(`Check status with: systemctl status ${serviceName}`));
             } catch (error) {
+                await Logger.error(`Failed to install service on ${platformName}: ${error}`);
                 console.error(chalk.red('Failed to install service:'), error);
             }
         }
@@ -130,8 +136,10 @@ WantedBy=multi-user.target
             try {
                 await execAsync(`launchctl unload ${plistPath}`);
                 await fs.unlink(plistPath);
+                await Logger.info(`Service uninstalled from ${platformName}`);
                 console.log(chalk.green('Service uninstalled successfully.'));
             } catch (error) {
+                await Logger.error(`Failed to uninstall service from ${platformName}: ${error}`);
                 console.error(chalk.red('Failed to uninstall service:'), error);
             }
         } else if (isLinux) {
@@ -141,8 +149,10 @@ WantedBy=multi-user.target
                 await execAsync(`systemctl disable ${serviceName}`);
                 await fs.unlink(servicePath);
                 await execAsync('systemctl daemon-reload');
+                await Logger.info(`Service uninstalled from ${platformName}`);
                 console.log(chalk.green('Service uninstalled successfully.'));
             } catch (error) {
+                await Logger.error(`Failed to uninstall service from ${platformName}: ${error}`);
                 console.error(chalk.red('Failed to uninstall service:'), error);
             }
         }
@@ -151,16 +161,20 @@ WantedBy=multi-user.target
             console.log(chalk.yellow('Starting service...'));
             try {
                 await execAsync(`launchctl load ${plistPath}`);
+                await Logger.info(`Service started on ${platformName}`);
                 console.log(chalk.green('Service started.'));
             } catch (err) {
+                await Logger.error(`Failed to start service on ${platformName}: ${err}`);
                 console.error(chalk.red('Failed to start service (it might be already loaded):'), err);
             }
         } else if (isLinux) {
             console.log(chalk.yellow('Starting service...'));
             try {
                 await execAsync(`systemctl start ${serviceName}`);
+                await Logger.info(`Service started on ${platformName}`);
                 console.log(chalk.green('Service started.'));
             } catch (err) {
+                await Logger.error(`Failed to start service on ${platformName}: ${err}`);
                 console.error(chalk.red('Failed to start service:'), err);
             }
         }
@@ -169,16 +183,20 @@ WantedBy=multi-user.target
             console.log(chalk.yellow('Stopping service...'));
             try {
                 await execAsync(`launchctl unload ${plistPath}`);
+                await Logger.info(`Service stopped on ${platformName}`);
                 console.log(chalk.green('Service stopped.'));
             } catch (err) {
+                await Logger.error(`Failed to stop service on ${platformName}: ${err}`);
                 console.error(chalk.red('Failed to stop service:'), err);
             }
         } else if (isLinux) {
             console.log(chalk.yellow('Stopping service...'));
             try {
                 await execAsync(`systemctl stop ${serviceName}`);
+                await Logger.info(`Service stopped on ${platformName}`);
                 console.log(chalk.green('Service stopped.'));
             } catch (err) {
+                await Logger.error(`Failed to stop service on ${platformName}: ${err}`);
                 console.error(chalk.red('Failed to stop service:'), err);
             }
         }
@@ -188,16 +206,20 @@ WantedBy=multi-user.target
             try {
                 try { await execAsync(`launchctl unload ${plistPath}`); } catch { /* ignore */ }
                 await execAsync(`launchctl load ${plistPath}`);
+                await Logger.info(`Service restarted on ${platformName}`);
                 console.log(chalk.green('Service restarted.'));
             } catch (err) {
+                await Logger.error(`Failed to restart service on ${platformName}: ${err}`);
                 console.error(chalk.red('Failed to restart service:'), err);
             }
         } else if (isLinux) {
             console.log(chalk.yellow('Restarting service...'));
             try {
                 await execAsync(`systemctl restart ${serviceName}`);
+                await Logger.info(`Service restarted on ${platformName}`);
                 console.log(chalk.green('Service restarted.'));
             } catch (err) {
+                await Logger.error(`Failed to restart service on ${platformName}: ${err}`);
                 console.error(chalk.red('Failed to restart service:'), err);
             }
         }

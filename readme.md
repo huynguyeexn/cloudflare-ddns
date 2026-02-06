@@ -60,6 +60,32 @@ cfddns logs -f
 - **Khởi động lại**: `sudo cfddns service restart`
 - **Gỡ bỏ service**: `sudo cfddns service uninstall`
 
+## Docker (Khuyên dùng cho NAS/Synology/RPi)
+
+Bạn có thể sử dụng Docker để chạy ổn định hơn trên các thiết bị NAS hoặc Server:
+
+```bash
+# 1. Tạo thư mục config và file config.json (hoặc copy từ máy khác)
+mkdir config
+# Cấu hình file config.json của bạn vào thư mục config
+
+# 2. Chạy bằng Docker Compose
+docker-compose up -d
+```
+
+Hoặc chạy lệnh trực tiếp bằng Docker:
+
+```bash
+docker run -d \
+  --name cfddns \
+  --restart unless-stopped \
+  -v $(pwd)/config:/config \
+  huynguyeexn/cloudflare-ddns:latest
+```
+
+*Lưu ý: Bạn nên thực hiện lệnh `cfddns setup` trên máy cá nhân trước để lấy file `config.json`, sau đó mount nó vào container.*
+
+
 ## Phát triển (Dành cho Developer)
 
 Nếu bạn muốn tự build từ source:

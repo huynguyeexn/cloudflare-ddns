@@ -1,0 +1,11 @@
+node_modules
+dist
+cfddns
+*.log
+.git
+.github
+.agent
+.vscode
+.prettierrc
+eslint.config.js
+package-lock.json
