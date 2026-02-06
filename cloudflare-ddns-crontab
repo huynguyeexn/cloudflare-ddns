@@ -1,8 +1,0 @@
-#!/bin/bash
-# /etc/cron.d/cloudflare-ddns-crontab: crontab entries for the cloudflare-ddns package
-
-SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/snap/bin/:/root/.bun/bin/
-
-# m h d m y user command
-*/2 * * * * root cd /root/cloudflare-ddns/ && bun cloudflare-ddns.js >> error.log # Every 5 minutes - See more in https://crontab.guru/examples.html

@@ -2,3 +2,5 @@
 *.log
 logs
 log
+cloudflare-ddns
+node_modules

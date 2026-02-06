@@ -1,82 +1,83 @@
-## Cloudflare DDNS
+# Cloudflare DDNS CLI
 
-Script tự động cập nhật IP hiện tại của server cho những record A, AAAA của các domain được quản lý bằng Cloudflare, thông qua [Cloudflare's client API](https://api.cloudflare.com/).
+Công cụ CLI tự động cập nhật IP cho Cloudflare DNS Records, hỗ trợ cài đặt nhanh và chạy ngầm (Systemd).
 
-### Yêu cầu
+## Tính năng
 
-Môi trường Linux OS, đã cài đặt [Bun.sh](https://bun.sh/)
+- **Cài đặt 1 dòng lệnh**: Tự động cài đặt Bun, build và setup service.
+- **Auto Update IP**: Chạy ngầm cập nhật IP mỗi 5 phút (mặc định).
+- **Quản lý dễ dàng**: Giao diện CLI tương tác để thêm/bớt domain.
+- **Systemd Integration**: Tự động khởi động cùng hệ thống.
 
-### Tạo API
+## Cài đặt
 
-Đăng nhập vào Cloudflare, vào [My Profile](https://dash.cloudflare.com/profile), chọn [API Tokens](https://dash.cloudflare.com/profile).
-
-Tạo `API Tokens` Zone DNS Edit, copy token này để cài đặt bước tiếp theo.
-
-### Cài đặt
-
-Tải source code:
+Chạy lệnh sau để cài đặt:
 
 ```bash
-git clone https://github.com/huynguyeexn/cloudflare-ddns.git
+curl -fsSL https://raw.githubusercontent.com/huynguyeexn/cloudflare-ddns/main/install.sh | bash
 ```
 
-Sau khi tải, di chuyển đến thư mục `cloudflare-ddns` chứa source code.
+_(Nếu repo chưa public hoặc bạn đang chạy local, hãy chạy file `./install.sh`)_
 
 ```bash
-cd cloudflare-ddns
+chmod +x install.sh
+./install.sh
 ```
 
-Tạo file `.env` từ file `.env.example` có sẵn.
+## Sử dụng
+
+Sau khi cài đặt, bạn có thể sử dụng lệnh `cloudflare-ddns` từ bất kỳ đâu.
+
+### 1. Cấu hình (Setup)
+
+Lần đầu chạy cần cấu hình Token và chọn Domain::
 
 ```bash
-cp .env.example .env
+cloudflare-ddns setup
 ```
 
-Thiết lập lại các thông số của file .env.
+- Nhập Cloudflare API Token.
+- Chọn các Zone và Record cần cập nhật tự động.
 
-- `API_TOKEN`
-  - Token được tạo ở bước trước đó.
-  - Ví dụ `API_TOKEN="ABCdeF-T6K7ppvhk6XDGbpN1fzBtr3WxP1P_mxoh"`
-- `RECORDS_NAME`
-  - Mảng các records cần cập nhật.
-  - Ví dụ `RECORDS_NAME=["domaincuaban.com"]`, `RECORDS_NAME=["domain1.com", "domain2.com"]`
-- `LATEST_IPV4`
-  - IPv4 gần nhất được cập nhật, script sẽ tự động điền, không cần điền.
-  - Ví dụ `LATEST_IPV4=142.251.214.142`.
-- `LATEST_IPV6`
-  - IPv6 gần nhất được cập nhật, script sẽ tự động điền, không cần điền.
-  - Ví dụ `LATEST_IPV6=2405:4803:ffff:ffff:ffff:ffff:ffff:fffe`.
-- `LOGGING_WHEN_UNCHANGED_IP_ADDRESS`
-  - Show log nếu IP không có sự thay đổi (mặc định: false)
+### 2. Cài đặt Service (Chạy ngầm)
 
-### Run source
-
-**Cần cập nhật thông số cho file `.env`, và cài đặt [Bun.sh](https://bun.sh/) trước khi run source**
-
-Lệnh run source:
+Để tool tự động chạy ngầm và khởi động cùng máy:
 
 ```bash
-bun cloudflare-ddns.js
+sudo cloudflare-ddns service install
 ```
 
-> Lưu ý: Script không chạy tự động, script chỉ chạy khi dùng lệnh trên.
+### 3. Các lệnh khác
 
-Nếu bạn muốn script chạy định kì thì xem tiếp phần dưới.
+- **Chạy thủ công (Loop)**:
+    ```bash
+    cloudflare-ddns start
+    ```
+- **Xem cấu hình hiện tại**:
+    ```bash
+    cloudflare-ddns config
+    ```
+- **Gỡ bỏ Service**:
+    ```bash
+    sudo cloudflare-ddns service uninstall
+    ```
 
-### Cập nhật IP định kì
+## Logs
 
-Để có thể định kì kiểm tra và cập nhật IP mới thì cần phải setup [crontab](https://vietnix.vn/crontab/):
+Logs được ghi tại `src/app.log` (hoặc nơi bạn chạy lệnh).
+_(Phiên bản binary sẽ ghi log theo cấu hình systemd hoặc file logs riêng)_
 
-Trong source code có file `cloudflare-ddns-crontab`, được thiết lập cơ bản như sau:
+## Phát triển
 
-- `*/5 * * * *` chạy crontab mỗi 5 phút, xem thêm tại đây [crontab.guru](https://crontab.guru/examples.html).
-- `cd /root/.cloudflare-ddns/` di chuyển tới thư mục chứa source code, chỉnh sửa giá trị trên thành đường dẫn đến thư mục source code của bạn.
-- `bun cloudflare-ddns.js >> error.log 2>&1` run source và ghi lỗi vào file `error.log`.
-
-Sau khi cập nhật lại các thiết lập trong file `cloudflare-ddns-crontab`.
-
-Chúng ta copy file vào thư mục có đường dẫn `/etc/cron.d/`.
+Yêu cầu [Bun](https://bun.sh).
 
 ```bash
-cp cloudflare-ddns-crontab /etc/cron.d/cloudflare-ddns-crontab
+# Cài dependency
+bun install
+
+# Chạy dev
+bun src/index.ts start
+
+# Build binary
+bun run build
 ```
