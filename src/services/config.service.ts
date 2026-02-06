@@ -10,6 +10,17 @@ export interface Config {
         v4?: string;
         v6?: string;
     };
+    notifications?: {
+        enabled: boolean;
+        provider: 'ntfy';
+        ntfy?: {
+            url: string;
+            topic: string;
+            token?: string;
+        };
+    };
+    lastSuccess?: string; // ISO Date string
+    lastMessage?: string;
 }
 
 export class ConfigService {

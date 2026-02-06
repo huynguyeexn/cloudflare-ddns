@@ -2,6 +2,7 @@ import { ConfigService } from '../services/config.service.js';
 import { CloudflareService } from '../services/cloudflare.service.js';
 import { IpService } from '../services/ip.service.js';
 import { Logger } from '../utils/logger.js';
+import { NotificationService } from '../services/notification.service.js';
 
 export async function startCommand() {
     const configService = new ConfigService();
@@ -17,6 +18,7 @@ export async function startCommand() {
     Logger.info(`Records: ${config.records.join(', ')}`);
 
     const cfService = new CloudflareService(config.apiToken);
+    const notificationService = new NotificationService(config.notifications);
 
     const loop = async () => {
         try {
@@ -83,13 +85,29 @@ export async function startCommand() {
                 config.lastKnownIp = { v4: ipv4 || undefined, v6: ipv6 || undefined };
                 await configService.save(config);
                 Logger.success('Update completed.');
+
+                // Send Notification
+                const message = `Records: ${config.records.join(', ')}\nIPv4: ${ipv4 || 'N/A'}\nIPv6: ${ipv6 || 'N/A'}`;
+                await notificationService.send('IP Address Changed', message, 'high');
             } else {
-                // Logger.info('IPs unchanged.');
-                // Don't log on every loop to keep log clean, unless debug?
-                // configService might have a setting for verbose logging.
+                Logger.info('IPs unchanged.');
             }
+
+            config.lastSuccess = new Date().toISOString();
+            config.lastMessage = 'Service is running normally.';
+            await configService.save(config);
+
         } catch (error) {
             Logger.error('Error in loop:', error);
+            await notificationService.send('Cloudflare DDNS Error', String(error), 'high');
+
+            // Try to save error state to config
+            try {
+                config.lastMessage = `Error: ${String(error)}`;
+                await configService.save(config);
+            } catch (saveError) {
+                Logger.error('Failed to save error state to config:', saveError);
+            }
         }
 
         setTimeout(loop, config.interval * 1000);

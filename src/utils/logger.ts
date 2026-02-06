@@ -2,8 +2,10 @@ import chalk from 'chalk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import os from 'node:os';
+
 export class Logger {
-    private static logFile: string = 'app.log';
+    private static logFile: string = path.join(os.homedir(), '.config', 'cloudflare-ddns', 'app.log');
 
     static setLogFile(filePath: string) {
         this.logFile = filePath;

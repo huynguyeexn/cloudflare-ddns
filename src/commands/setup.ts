@@ -88,13 +88,14 @@ export async function setupCommand() {
             name: 'selectedRecords',
             message: 'Select the DNS Records (subdomains) to update automatically:',
             choices: uniqueNames,
+            default: currentConfig?.records,
             validate: (input) => (input.length > 0 ? true : 'Choose at least one record')
         },
         {
             type: 'input',
             name: 'interval',
             message: 'Check interval in seconds (>= 10):',
-            default: '300',
+            default: currentConfig?.interval ? String(currentConfig.interval) : '300',
             validate: (value) => {
                 const parsed = parseInt(value, 10);
                 return !isNaN(parsed) && parsed >= 10 ? true : 'Interval must be a number >= 10';
@@ -103,10 +104,57 @@ export async function setupCommand() {
         }
     ]);
 
+    // Notification Setup
+    const { enableNotifications } = await inquirer.prompt([
+        {
+            type: 'confirm',
+            name: 'enableNotifications',
+            message: 'Do you want to enable notifications (NTFY)?',
+            default: currentConfig?.notifications?.enabled || false
+        }
+    ]);
+
+    let notificationConfig;
+
+    if (enableNotifications) {
+        const ntfyConfig = await inquirer.prompt([
+            {
+                type: 'input',
+                name: 'url',
+                message: 'NTFY Server URL (default: https://ntfy.sh):',
+                default: currentConfig?.notifications?.ntfy?.url || 'https://ntfy.sh'
+            },
+            {
+                type: 'input',
+                name: 'topic',
+                message: 'NTFY Topic Name:',
+                default: currentConfig?.notifications?.ntfy?.topic,
+                validate: (input) => (input.length > 0 ? true : 'Topic is required')
+            },
+            {
+                type: 'input',
+                name: 'token',
+                message: 'NTFY Access Token (optional, for private topics):',
+                default: currentConfig?.notifications?.ntfy?.token
+            }
+        ]);
+
+        notificationConfig = {
+            enabled: true,
+            provider: 'ntfy' as const,
+            ntfy: {
+                url: ntfyConfig.url,
+                topic: ntfyConfig.topic,
+                token: ntfyConfig.token || undefined
+            }
+        };
+    }
+
     const config: Config = {
         apiToken,
         records: selectedRecords,
-        interval: interval
+        interval: interval,
+        notifications: notificationConfig
     };
 
     await configService.save(config);
