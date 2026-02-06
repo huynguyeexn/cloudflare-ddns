@@ -52,8 +52,11 @@ jobs:
 
       - name: Compress binary with UPX
         run: |
-          # UPX can significantly reduce Bun standalone binary size (e.g. 60MB -> 20MB)
-          upx --best --lzma ${{ matrix.outfile }} || upx --best ${{ matrix.outfile }}
+          UPX_FLAGS="--best --lzma"
+          if [ "${{ runner.os }}" == "macOS" ]; then
+            UPX_FLAGS="$UPX_FLAGS --force-macos"
+          fi
+          upx $UPX_FLAGS ${{ matrix.outfile }} || upx --best ${{ matrix.outfile }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
