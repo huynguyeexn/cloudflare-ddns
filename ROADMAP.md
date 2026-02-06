@@ -31,6 +31,8 @@ This document outlines the planned features and improvements for `cloudflare-ddn
   - [x] Create `Dockerfile`.
   - [x] Create `docker-compose.yml`.
   - [x] CI/CD to Docker Hub via GitHub Actions.
+  - [x] **Optimization**: Use Alpine base and bundle JS to reduce image size (~45MB).
+- [x] **Dual Stack Toggle**: Add IPv4/IPv6 on/off toggles in setup wizard.
 - [ ] **Cron / One-shot Mode**: Add `--once` flag provided for users who prefer system `crontab`.
 - [x] **Manual Sync**: Add `cloudflare-ddns run now` to manually trigger Cloudflare record updates (always forced).
 

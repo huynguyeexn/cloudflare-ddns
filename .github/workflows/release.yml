@@ -42,6 +42,17 @@ jobs:
         run: |
           bun build --compile --minify --target ${{ matrix.target }} src/index.ts --outfile ${{ matrix.outfile }}
 
+      - name: Install UPX
+        uses: svenstaro/upx-action@v2
+        with:
+          install-only: true
+
+      - name: Compress binary with UPX
+        run: |
+          # UPX can significantly reduce Bun standalone binary size (e.g. 60MB -> 20MB)
+          # --best for maximum compression, --lzma for even better results on supported platforms
+          upx --best --lzma ${{ matrix.outfile }} || upx --best ${{ matrix.outfile }}
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

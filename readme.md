@@ -9,8 +9,10 @@ A powerful, interactive CLI tool to automatically update Cloudflare DNS records 
 - **🚀 One-command Installation**: Automated script to install Bun, build binary, and setup the CLI.
 - **🔄 Auto Update**: Runs in the background (as a service) to update your IP every 5 minutes (configurable).
 - **🛠️ Interactive Setup**: Easy wizard to configure API tokens and select DNS records.
+- **💡 Dual Stack**: Support both IPv4 (A) and IPv6 (AAAA) records with easy on/off toggles.
+- **🆙 Self-update**: Update the CLI to the latest version directly from the terminal.
 - **🐧 Systemd & Launchd**: Seamless background service integration for Linux and macOS.
-- **🐳 Docker Support**: Ready-to-use Docker images for NAS (Synology/QNAP), Raspberry Pi, and servers.
+- **🐳 Docker Support**: Ultra-lightweight Docker images (~45MB) with Bun Alpine.
 - **🔔 Notifications**: Support for `ntfy` to alert you when your IP changes.
 - **🔍 IP Diagnostics**: Built-in tool to verify and debug public IP lookup sources.
 
@@ -33,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/huynguyeexn/cloudflare-ddns/main/in
 After installation, the `cloudflare-ddns` command will be available globally.
 
 ### 1. Interactive Configuration
-Run the setup wizard to enter your Cloudflare API Token and select which domains/subdomains should be updated.
+Run the setup wizard to enter your Cloudflare API Token, select records, and toggle IPv4/IPv6 support.
 
 ```bash
 cloudflare-ddns setup
@@ -67,6 +69,14 @@ cloudflare-ddns logs -f
 If you've just changed something and want to force an update immediately:
 ```bash
 cloudflare-ddns run now
+```
+
+### Self Update
+Keep your CLI up to date with the latest features and security fixes:
+```bash
+cloudflare-ddns self-update
+# Or just check without updating
+cloudflare-ddns self-update --check
 ```
 
 ### Service Management
