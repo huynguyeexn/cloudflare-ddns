@@ -1,87 +1,101 @@
 # Cloudflare DDNS CLI
 
-Công cụ CLI tự động cập nhật IP cho Cloudflare DNS Records, hỗ trợ cài đặt nhanh và chạy ngầm (Systemd).
+A powerful, interactive CLI tool to automatically update Cloudflare DNS records with your public IP address. Designed for simplicity with built-in service management for Linux (Systemd) and macOS (Launchd).
 
-## Tính năng
+[![Docker Publish](https://github.com/huynguyeexn/cloudflare-ddns/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/huynguyeexn/cloudflare-ddns/actions/workflows/docker-publish.yml)
 
-- **Cài đặt 1 dòng lệnh**: Tự động cài đặt Bun, build và setup service.
-- **Auto Update IP**: Chạy ngầm cập nhật IP mỗi 5 phút (mặc định).
-- **Quản lý dễ dàng**: Giao diện CLI tương tác để thêm/bớt domain.
-- **Systemd Integration**: Tự động khởi động cùng hệ thống.
+## ✨ Features
 
-## Cài đặt
+- **🚀 One-command Installation**: Automated script to install Bun, build binary, and setup the CLI.
+- **🔄 Auto Update**: Runs in the background (as a service) to update your IP every 5 minutes (configurable).
+- **🛠️ Interactive Setup**: Easy wizard to configure API tokens and select DNS records.
+- **🐧 Systemd & Launchd**: Seamless background service integration for Linux and macOS.
+- **🐳 Docker Support**: Ready-to-use Docker images for NAS (Synology/QNAP), Raspberry Pi, and servers.
+- **🔔 Notifications**: Support for `ntfy` to alert you when your IP changes.
+- **🔍 IP Diagnostics**: Built-in tool to verify and debug public IP lookup sources.
 
-Chạy lệnh sau để cài đặt (Tự động nhận diện hệ điều hành và tải bản build phù hợp):
+---
+
+## 📦 Installation
+
+Run the following command to automatically detect your OS, download the correct binary, and setup the CLI:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/huynguyeexn/cloudflare-ddns/main/install.sh | bash
 ```
 
-**Lưu ý:** Installer sẽ ưu tiên tải binary đã build sẵn từ GitHub Releases. Nếu không tìm thấy bản phù hợp, nó sẽ tự động tải source code và build (yêu cầu máy có cài [Bun](https://bun.sh)).
+*Note: The installer will try to download a pre-built binary from GitHub Releases first. If a compatible binary is not found, it will build from source locally (requires [Bun](https://bun.sh)).*
 
-## Sử dụng
+---
 
-Sau khi cài đặt, bạn có thể sử dụng lệnh `cloudflare-ddns` từ bất kỳ đâu.
+## 🚀 Quick Start
 
-### 1. Cấu hình (Setup)
+After installation, the `cloudflare-ddns` command will be available globally.
 
-Lần đầu chạy cần cấu hình Token và chọn Domain:
+### 1. Interactive Configuration
+Run the setup wizard to enter your Cloudflare API Token and select which domains/subdomains should be updated.
 
 ```bash
 cloudflare-ddns setup
 ```
 
-### 2. Cài đặt Service (Chạy ngầm)
-
-Để tool tự động chạy ngầm và khởi động cùng máy:
+### 2. Run as a Background Service
+To ensure the IP stays updated automatically across reboots, install the background service:
 
 ```bash
 sudo cloudflare-ddns service install
 ```
+*This will detect your OS (Linux/macOS) and install the appropriate service manager configuration.*
 
-Dịch vụ này hỗ trợ cả **Systemd (Linux)** và **Launchd (macOS)**.
+---
 
-### 3. Kiểm tra trạng thái & Logs
+## 🛠️ Usage Examples
 
-Xem trạng thái hoạt động của IP và Service:
+### Check Status
+View your current public IPs (v4/v6), last update time, and service health.
 ```bash
 cloudflare-ddns status
 ```
 
-Xem logs realtime:
+### Real-time Logs
+Monitor activity and troubleshoot IP changes.
 ```bash
 cloudflare-ddns logs -f
 ```
 
-### 4. Các lệnh quản lý Service
-
-- **Dừng service**: `sudo cloudflare-ddns service stop`
-- **Chạy lại service**: `sudo cloudflare-ddns service start`
-- **Khởi động lại**: `sudo cloudflare-ddns service restart`
-- **Gỡ bỏ service**: `sudo cloudflare-ddns service uninstall`
-
-### 5. Cập nhật thủ công (Manual Update)
-
-Chạy cập nhật IP ngay lập tức (luôn ép buộc đồng bộ với Cloudflare):
+### Manual Force Update
+If you've just changed something and want to force an update immediately:
 ```bash
 cloudflare-ddns run now
 ```
 
-## Docker (Khuyên dùng cho NAS/Synology/RPi)
+### Service Management
+- **Start**: `sudo cloudflare-ddns service start`
+- **Stop**: `sudo cloudflare-ddns service stop`
+- **Restart**: `sudo cloudflare-ddns service restart`
+- **Uninstall**: `sudo cloudflare-ddns service uninstall`
 
-Bạn có thể sử dụng Docker để chạy ổn định hơn trên các thiết bị NAS hoặc Server:
+---
 
-```bash
-# 1. Tạo thư mục config và file config.json (hoặc copy từ máy khác)
-mkdir config
-# Cấu hình file config.json của bạn vào thư mục config
+## 🐳 Docker Usage
 
-# 2. Chạy bằng Docker Compose
-docker-compose up -d
+Recommended for NAS or server environments.
+
+### Docker Compose
+Create a `docker-compose.yml` file:
+```yaml
+services:
+  cloudflare-ddns:
+    image: huynguyeexn/cloudflare-ddns:latest
+    container_name: cloudflare-ddns
+    restart: unless-stopped
+    volumes:
+      - ./config:/config
+    environment:
+      - CLOUDFLARE_DDNS_CONFIG_PATH=/config/config.json
 ```
 
-Hoặc chạy lệnh trực tiếp bằng Docker:
-
+### Command Line
 ```bash
 docker run -d \
   --name cloudflare-ddns \
@@ -90,21 +104,41 @@ docker run -d \
   huynguyeexn/cloudflare-ddns:latest
 ```
 
-*Lưu ý: Bạn nên thực hiện lệnh `cloudflare-ddns setup` trên máy cá nhân trước để lấy file `config.json`, sau đó mount nó vào container.*
+*Tip: It's easiest to run `cloudflare-ddns setup` on your local machine first, then copy the generated `config.json` to your server's config directory.*
 
+---
 
-## Phát triển (Dành cho Developer)
+## 🔧 Maintenance & Diagnostics
 
-Nếu bạn muốn tự build từ source:
+### IP Source Check
+If you are having trouble getting your public IP, run the diagnostic tool to see which lookup sources are working:
+```bash
+# Only available if you have the source code / dev environment
+bun tests/check-ip-sources.ts
+```
+
+### Running Tests
+Ensure everything is working correctly:
+```bash
+bun test
+```
+
+---
+
+## 🏗️ Development
 
 ```bash
-# Cài dependency
+# Install dependencies
 bun install
 
-# Chạy dev
+# Run in development mode
 bun run src/index.ts run
 
-# Build binary local
+# Build local binary
 bun run build
 ```
 
+---
+
+## 📄 License
+MIT © [Huy Nguyen](https://github.com/huynguyeexn)
