@@ -4,12 +4,7 @@ import { Logger } from '../utils/logger.js';
 
 export async function testNotiCommand() {
     const configService = new ConfigService();
-    const config = await configService.load();
-
-    if (!config) {
-        Logger.error('Configuration not found. Please run "cloudflare-ddns setup" first.');
-        process.exit(1);
-    }
+    const config = await configService.loadOrExit();
 
     if (!config.notifications || !config.notifications.enabled) {
         Logger.warning('Notifications are disabled in the configuration.');

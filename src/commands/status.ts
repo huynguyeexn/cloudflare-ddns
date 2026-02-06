@@ -7,12 +7,7 @@ const execAsync = util.promisify(exec);
 
 export async function statusCommand() {
     const configService = new ConfigService();
-    const config = await configService.load();
-
-    if (!config) {
-        console.log(chalk.red('Configuration not found. Please run "cloudflare-ddns setup" first.'));
-        process.exit(1);
-    }
+    const config = await configService.loadOrExit();
 
     console.log(chalk.bold('\n📊 Cloudflare DDNS Status\n'));
 

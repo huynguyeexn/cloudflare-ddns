@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
+import chalk from 'chalk';
 
 export interface Config {
     apiToken: string;
@@ -44,6 +45,15 @@ export class ConfigService {
         } catch (_error) {
             return null;
         }
+    }
+
+    async loadOrExit(): Promise<Config> {
+        const config = await this.load();
+        if (!config) {
+            console.error(chalk.red('Configuration not found. Please run "cloudflare-ddns setup" first.'));
+            process.exit(1);
+        }
+        return config;
     }
 
     async save(config: Config): Promise<void> {

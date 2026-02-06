@@ -9,6 +9,7 @@
         "start": "bun run src/index.ts run",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
+        "test": "bun test",
         "format": "prettier --write ."
     },
     "dependencies": {

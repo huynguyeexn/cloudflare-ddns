@@ -4,12 +4,7 @@ import { DdnsService } from '../services/ddns.service.js';
 
 export async function startCommand() {
     const configService = new ConfigService();
-    const config = await configService.load();
-
-    if (!config) {
-        Logger.error('Configuration not found. Please run "cloudflare-ddns setup" first.');
-        process.exit(1);
-    }
+    const config = await configService.loadOrExit();
 
     Logger.info('Starting Cloudflare DDNS Service...');
     Logger.info(`Interval: ${config.interval} seconds`);

@@ -1,13 +1,9 @@
 import fs from 'node:fs';
 import chalk from 'chalk';
-import path from 'node:path';
-import os from 'node:os';
+import { Logger } from '../utils/logger.js';
 
 export async function logsCommand(options: { lines: string; follow: boolean }) {
-    // We need to get the log file path. Since Logger.logFile is private, 
-    // we'll reconstruct it or add a getter. 
-    // Let's just reconstruct it here to match Logger's default.
-    const logFile = path.join(os.homedir(), '.config', 'cloudflare-ddns', 'app.log');
+    const logFile = Logger.getLogFile();
 
     if (!fs.existsSync(logFile)) {
         console.log(chalk.yellow(`Log file not found at: ${logFile}`));

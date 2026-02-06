@@ -47,12 +47,8 @@ program
     .description('Show current config')
     .action(async () => {
         const cs = new ConfigService();
-        const config = await cs.load();
-        if (config) {
-            console.log(JSON.stringify(config, null, 2));
-        } else {
-            console.log(chalk.red('No config found. Run "setup" first.'));
-        }
+        const config = await cs.loadOrExit();
+        console.log(JSON.stringify(config, null, 2));
     });
 
 program

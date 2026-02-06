@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
-import { Logger } from './logger.js';
+import { Logger } from '../../src/utils/logger.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';

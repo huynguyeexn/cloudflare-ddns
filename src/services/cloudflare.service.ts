@@ -1,4 +1,5 @@
 import { Logger } from '../utils/logger.js';
+import { fetchWithTimeout } from '../utils/http.js';
 
 interface CloudflareResponse<T> {
     success: boolean;
@@ -37,10 +38,11 @@ export class CloudflareService {
             Authorization: `Bearer ${this.apiToken}`
         };
 
-        const response = await fetch(url, {
+        const response = await fetchWithTimeout(url, {
             method,
             headers,
-            body: body ? JSON.stringify(body) : undefined
+            body: body ? JSON.stringify(body) : undefined,
+            timeout: 10000
         });
 
         const data = (await response.json()) as CloudflareResponse<T>;

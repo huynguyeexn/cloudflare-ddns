@@ -1,5 +1,6 @@
 import { type Config } from './config.service.js';
 import { Logger } from '../utils/logger.js';
+import { fetchWithTimeout } from '../utils/http.js';
 
 export class NotificationService {
     constructor(private config: Config['notifications']) { }
@@ -30,10 +31,11 @@ export class NotificationService {
                 headers['Authorization'] = `Bearer ${this.config.ntfy.token}`;
             }
 
-            const response = await fetch(target, {
+            const response = await fetchWithTimeout(target, {
                 method: 'POST',
                 body: message,
-                headers
+                headers,
+                timeout: 10000
             });
 
             if (!response.ok) {
